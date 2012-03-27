@@ -1,1 +1,0 @@
-/Users/daifuye/Documents/Apps/UCLA Course Manager/Resources/directory.js

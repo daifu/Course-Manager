@@ -5,13 +5,15 @@ require('lib/require_patch').monkeypatch(this);
 globals = {};
 
 (function() {
-  var AppTabGroup, AppWindow;
+  var AppTabGroup, AppWindow, SearchWindow;
   AppTabGroup = require('ui/AppTabGroup');
   AppWindow = require('ui/AppWindow');
+  SearchWindow = require('ui/SearchWindow');
+  
   globals.tabs = new AppTabGroup({
     title: 'Search',
     icon: 'images/Search_24.png',
-    window: new AppWindow({
+    window: new SearchWindow({
       title: 'Search',
       backgroundColor: 'white'
     })

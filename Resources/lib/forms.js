@@ -28,7 +28,7 @@ keyboardMap[exports.TYPE_TEXT] = Ti.UI.KEYBOARD_DEFAULT;
 
 var handleStyle = function(form, textField, title) {
   if (form.fieldStyle === exports.STYLE_HINT && textField) {
-    textField.hintText = title; 
+    textField.hintText = title;
   } else {
     form.container.add(Ti.UI.createLabel({
       text: title,
@@ -41,7 +41,7 @@ var handleStyle = function(form, textField, title) {
       },
       height: 'auto',
       width: 'auto'
-    }));  
+    }));
     if (textField) {
       textField.top = '5dp';
     }
@@ -57,8 +57,8 @@ var setupPickerTextField = function(textField, pickerType, data) {
   textField.rightButtonMode = Ti.UI.INPUT_BUTTONMODE_ALWAYS;
   
   textField.addEventListener('focus', function(e) {
-    e.source.blur(); 
-    require('helpers/semiModalPicker').createSemiModalPicker({
+    e.source.blur();
+    require('lib/semiModalPicker').createSemiModalPicker({
       textField: textField,
       value: textField.value,
       type: pickerType,
@@ -73,7 +73,7 @@ var addField = function(field, fieldRefs) {
   var id = field.id || title;
   var type = field.type || exports.TYPE_TEXT;
   var form = this;
-  var fieldObject = undefined;
+  var fieldObject;
   
   if (type === exports.TYPE_TEXT ||
     type === exports.TYPE_EMAIL ||
@@ -103,7 +103,7 @@ var addField = function(field, fieldRefs) {
       });
       handleStyle(form, undefined, title);
       for (var i in field.data) {
-        fieldObject.add(Ti.UI.createPickerRow({title:field.data[i]}));  
+        fieldObject.add(Ti.UI.createPickerRow({title:field.data[i]}));
       }
     } else {
       fieldObject = Ti.UI.createTextField(textFieldDefaults);
@@ -120,10 +120,10 @@ var addField = function(field, fieldRefs) {
     button.addEventListener('click', function(e) {
       var values = {};
       for (var i in fieldRefs) {
-        values[i] = fieldRefs[i].value; 
+        values[i] = fieldRefs[i].value;
       }
-      form.fireEvent(id, {values:values});  
-    }); 
+      form.fireEvent(id, {values:values});
+    });
     form.container.add(button);
   }
   
@@ -140,12 +140,30 @@ var addFields = function(fields, fieldRefs) {
   }
 };
 
-exports.createForm = function(o) {
-  var container = Ti.UI.createView({
+var merge_options = function(obj1, obj2) {
+  var obj3 = {};
+  for (var attrname1 in obj1) {
+    obj3[attrname1] = obj1[attrname1];
+  }
+  for (var attrname2 in obj2) {
+    obj3[attrname2] = obj2[attrname2];
+  }
+  return obj3;
+};
+
+exports.createForm = function(o, args) {
+  if (args === undefined || args === {}) {
+    args = {};
+  }
+  var default_args = {
     layout: 'vertical',
     height: 'auto'
-  });
+  };
+  args = merge_options(default_args, args);
+  
+  var container = Ti.UI.createView(args);
   var fieldRefs = {};
+  
   var form = Ti.UI.createScrollView({
     contentHeight: 'auto',
     contentWidth: 'auto',

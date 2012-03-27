@@ -1,1 +1,0 @@
-/Users/daifuye/Documents/Apps/UCLA Course Manager/Resources/lib/require_patch.js
