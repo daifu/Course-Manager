@@ -23,6 +23,7 @@
 		}, style);
 
 		search_form.addEventListener('search_course', function(e){
+			// Add logic to searching
 			Ti.API.info(e);
 		});
 		
