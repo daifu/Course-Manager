@@ -1,9 +1,9 @@
-// Create a table view for all the subject areas
 (function(){
-    
-    // Working with the current window
-    var table = require('lib/tables'), subject_area_table, data;
    
+    // Working with the current window
+    var instance, table = require('lib/tables'), courses_table, data;
+    instance = Ti.UI.currentWindow;
+    // TODO: changed to with real data
     data = [{
         title : "Aerospace Studies",
         className : "tableRow",
@@ -12,7 +12,7 @@
             "quarter_year" : "Spring 2012",
             "course" : "Aerospace Studies"
         },
-        js : "Subjects.js"
+        js : "ui/SubDirectories/Courses.js"
     }, {
         title : "Anthropology",
         className : "tableRow",
@@ -21,7 +21,7 @@
             "quarter_year" : "Summer 2012",
             "course" : "Anthropology"
         },
-        js : "Subjects.js"
+        js : "ui/SubDirectories/Courses.js"
     }, {
         title : "Art",
         className : "tableRow",
@@ -30,7 +30,7 @@
             "quarter_year" : "Winter 2012",
             "course" : "Art"
         },
-        js : "Subjects.js"
+        js : "ui/SubDirectories/Courses.js"
     }, {
         title : "Computer Science",
         className : "tableRow",
@@ -39,11 +39,11 @@
             "quarter_year" : "Fall 2011",
             "course" : "Computer Science"
         },
-        js : "Subjects.js"
+        js : "ui/SubDirectories/Courses.js"
     }];
-    subject_area_table = new table.createDefaultTableView(data);
+    courses_table = table.createDefaultTableView(data);
 
     //Add table view to the instance
-    Ti.UI.currentWindow.add(subject_area_table);
+    instance.add(courses_table);
     
 })();

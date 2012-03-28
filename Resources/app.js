@@ -1,16 +1,16 @@
-var globals;
-
 require('lib/require_patch').monkeypatch(this);
 
-globals = {};
+var globals = {};
 
 (function() {
-    var AppTabGroup, AppWindow, SearchWindow, DirectoryWindow;
+    var AppTabGroup,
+        AppWindow,
+        SearchWindow,
+        DirectoryWindow;
     AppTabGroup = require('ui/AppTabGroup');
     AppWindow = require('ui/AppWindow');
     SearchWindow = require('ui/SearchWindow');
     DirectoryWindow = require('ui/DirectoryWindow');
-
 
     globals.tabs = new AppTabGroup({
         title: 'Search',

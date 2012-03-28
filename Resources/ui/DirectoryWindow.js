@@ -1,7 +1,7 @@
 (function() {
 
 	exports.DirectoryWindow = function(args) {
-		var instance,
+		var win,
             table = require('lib/tables'),
             quarter_year_table,
             data;
@@ -12,15 +12,14 @@
 				{title: "Winter 2012", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Winter 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
 				{title: "Fall 2011", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Fall 2011"}, js:"ui/SubDirectories/SubjectAreas.js"}];
 		
-        quarter_year_table = table.createDefaultTableView(data);
+        quarter_year_table = new table.createDefaultTableView(data);
 		
 		//Create instance of the window
-		instance = Ti.UI.createWindow(args);
+		win = Ti.UI.createWindow(args);
 		//Add table view to the instance
-		instance.add(quarter_year_table);
+		win.add(quarter_year_table);
 		
-		
-		return instance;
+		return win;
 	};
 
 })();

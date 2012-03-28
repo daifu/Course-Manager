@@ -1,8 +1,8 @@
 (function(){
-    
+
     exports.createDefaultTableView = function(data) {
         var table, rowData = [], filterBar;
- 
+        
         // filterBar to filter out the result on the table
         filterBar = Titanium.UI.createSearchBar({
             showCancel: true,
@@ -28,6 +28,7 @@
             search: filterBar,
             filterAttribute: "searchFilter"
         });
+        
         // Handle row click event
         table.addEventListener('click', function(e){
             if (e.source.hasChild) {
@@ -38,7 +39,16 @@
                     dataToPass: e.source.dataToPass,
                     url: e.source.js
                 });
-                globals.tabs.currentTab.open(w, {animated: true});
+                // TODO: fixed this without using try catch.
+                try {
+                    globals.tabs.currentTab.open(w, {
+                        animated : true
+                    });
+                } catch(err) {
+                    Ti.UI.currentTab.open(w, {
+                        animated : true
+                    });
+                }
             } else {
                 alert("No window to open :(");
             }
