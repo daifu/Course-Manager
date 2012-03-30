@@ -12,7 +12,7 @@
             "quarter_year" : "Spring 2012",
             "course" : "Aerospace Studies"
         },
-        js : "ui/SubDirectories/Courses.js"
+        js : "Courses.js"
     }, {
         title : "Anthropology",
         className : "tableRow",
@@ -21,7 +21,7 @@
             "quarter_year" : "Summer 2012",
             "course" : "Anthropology"
         },
-        js : "ui/SubDirectories/Courses.js"
+        js : "Courses.js"
     }, {
         title : "Art",
         className : "tableRow",
@@ -30,7 +30,7 @@
             "quarter_year" : "Winter 2012",
             "course" : "Art"
         },
-        js : "ui/SubDirectories/Courses.js"
+        js : "Courses.js"
     }, {
         title : "Computer Science",
         className : "tableRow",
@@ -39,7 +39,7 @@
             "quarter_year" : "Fall 2011",
             "course" : "Computer Science"
         },
-        js : "ui/SubDirectories/Courses.js"
+        js : "Courses.js"
     }];
     courses_table = table.createDefaultTableView(data);
 
