@@ -14,7 +14,7 @@
             {title: "Art Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Winter 2012", "course": "Art"}, js:"Courses.js"},
             {title: "Computer Science Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Fall 2011", "course": "Computer Science"}, js:"Courses.js"}];
 
-    subjects_table = table.createDefaultTableView(data);
+    subjects_table = table.createPullToRefreshView(data, "../../images/whiteArrow.png", "subjects");
 
     //Add table view to the instance
     instance.add(subjects_table);

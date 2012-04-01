@@ -41,7 +41,7 @@
         },
         js : "Courses.js"
     }];
-    courses_table = table.createDefaultTableView(data);
+    courses_table = table.createPullToRefreshView(data, "../../images/whiteArrow.png", "courses");
 
     //Add table view to the instance
     instance.add(courses_table);

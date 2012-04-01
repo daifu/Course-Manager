@@ -44,7 +44,6 @@
                         top : 10
                     }];
                     view.add(new table.createSettingsTableView(data));
-                    Ti.API.info(win);
                 } else {
                     Ti.API.info(e.error);
                 }

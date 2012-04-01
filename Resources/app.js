@@ -6,7 +6,7 @@ function resolveFontName(fontName) {
     if(Ti.Platform.name === "iPhone OS") {
         return fontName;
     } else {
-        return fontMap[fontName];
+        return globals.fontMap[fontName];
     }
 }
 
@@ -24,9 +24,13 @@ function resolveFontName(fontName) {
     };
     Ti.App.logoFont = resolveFontName("Frutiger LT Std");
     Ti.App.textFont = resolveFontName("Futura Std");
+    Ti.App.httpReqeDomain = "http://localhost:3000";
 
     Ti.Facebook.appid = "140022819458918";
     Ti.Facebook.permissions = ['publish_stream', 'user_about_me', 'email', 'friends_about_me', 'friends_photos'];
+    
+    // Install the database
+    Ti.Database.install('ucla_courses.sqlite', 'courses');
     
     var updateLoginStatus = function() {
         if(Ti.Facebook.loggedIn) {
@@ -41,28 +45,32 @@ function resolveFontName(fontName) {
                 icon : 'images/Search_24.png',
                 window : new SearchWindow({
                     title : 'Search',
-                    backgroundColor : 'white'
+                    backgroundColor : 'white',
+                    font: {fontFamily: Ti.App.textFont}
                 })
             }, {
                 title : 'Directory',
                 icon : 'images/list_24.png',
                 window : new DirectoryWindow({
                     title : 'Directory',
-                    backgroundColor : 'white'
+                    backgroundColor : 'white',
+                    font: {fontFamily: Ti.App.textFont}
                 })
             }, {
                 title : 'Starred',
                 icon : 'images/star_24.png',
                 window : new AppWindow({
                     title : 'Starred',
-                    backgroundColor : 'white'
+                    backgroundColor : 'white',
+                    font: {fontFamily: Ti.App.textFont}
                 })
             }, {
                 title : 'Settings',
                 icon : 'images/settings_24.png',
                 window : new SettingsWindow({
                     title : 'Settings',
-                    backgroundColor : 'white'
+                    backgroundColor : 'white',
+                    font: {fontFamily: Ti.App.textFont}
                 })
             });
             return globals.tabs.open();

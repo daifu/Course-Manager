@@ -12,12 +12,12 @@
 		dbData = db.getCoursesTerm();
 		
 		// TODO: changed to with real data
-		// data = [{title: "Spring 2012", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Spring 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
-				// {title: "Summer 2012", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Summer 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
-				// {title: "Winter 2012", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Winter 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
-				// {title: "Fall 2011", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Fall 2011"}, js:"ui/SubDirectories/SubjectAreas.js"}];
+		// data = [{title: "Spring 2012", className: "tableRow", hasChild:true, dataToPass:{"term":"Spring 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
+				// {title: "Summer 2012", className: "tableRow", hasChild:true, dataToPass:{"term":"Summer 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
+				// {title: "Winter 2012", className: "tableRow", hasChild:true, dataToPass:{"term":"Winter 2012"}, js:"ui/SubDirectories/SubjectAreas.js"},
+				// {title: "Fall 2011", className: "tableRow", hasChild:true, dataToPass:{"term":"Fall 2011"}, js:"ui/SubDirectories/SubjectAreas.js"}];
         
-        quarter_year_table = new table.createDefaultTableView(dbData);
+        quarter_year_table = new table.createPullToRefreshView(dbData, "images/whiteArrow.png", 'terms');
 		
 		//Create instance of the window
 		win = Ti.UI.createWindow(args);
