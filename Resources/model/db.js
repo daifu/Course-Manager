@@ -48,10 +48,10 @@
         createTermsTable(db);
         delete_query = "DELETE FROM terms";
         db.execute(delete_query);
-        insert_query = "INSERT INTO terms VALUES (?, ?, ?, ?)";
+        insert_query = "INSERT INTO terms (key, name, created_at) VALUES (?, ?, ?)";
 
         for(var i = 0; i < terms.length; i++) {
-            db.execute(insert_query, terms[i].key, terms[i].name, terms[i].created_at, i + 1);
+            db.execute(insert_query, terms[i].key, terms[i].name, terms[i].created_at);
             rowData = {
                 title : terms[i].name,
                 dataToPass : {
