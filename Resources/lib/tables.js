@@ -1,6 +1,66 @@
+require('lib/require_patch').monkeypatch(this);
 (function(){
+    
 
-    var createDefaultTableView = function(data) {
+    var createSettingsProfileImageView = function(image_url) {
+        var imageView = Ti.UI.createImageView({
+            image : image_url,
+            borderRadius : 5,
+            left : 5,
+            top : 5,
+            bottom : 5,
+            height : 50,
+            width : 50
+        });
+        return imageView;
+    };
+
+
+    var createSettingsProfileTextView = function(title) {
+        var textView = Ti.UI.createView({
+            height : 'auto',
+            layout : 'vertical',
+            left : 70,
+            top : 10,
+            bottom : 10,
+            right : 10
+        });
+
+        var text = Ti.UI.createLabel({
+            text : title,
+            height : 'auto'
+        });
+        textView.add(text);
+
+        return textView;
+    };
+    
+    exports.createSettingsTableView = function(data) {
+        var table, rowData = [];
+        // Add data to rowView
+        for (var i=0; i < data.length; i++) {
+            var row = Ti.UI.createTableViewRow({
+                height: 'auto',
+                className: data[i].className
+            });
+            
+            if (data[i].className === "settingsProfile") {
+                row.add(createSettingsProfileTextView(data[i].title));
+                row.add(createSettingsProfileImageView(data[i].leftImage));
+            } else {
+                Ti.API.info("createSettingsTableView: Not Implemented Yet.");
+            }
+            rowData.push(row);
+        }
+        table = Titanium.UI.createTableView({
+            data: rowData,
+            style:Titanium.UI.iPhone.TableViewStyle.GROUPED
+        });
+        
+        return table;
+    };
+
+    var createDefaultTableView = function(data, tableType) {
         var table, rowData = [], filterBar;
         
         // filterBar to filter out the result on the table
@@ -38,12 +98,12 @@
                     dataToPass: e.source.dataToPass,
                     url: e.source.js
                 });
-                // TODO: fixed this without using try catch.
-                try {
+
+                if(tableType === "terms") {
                     globals.tabs.currentTab.open(w, {
                         animated : true
                     });
-                } catch(err) {
+                } else {
                     Ti.UI.currentTab.open(w, {
                         animated : true
                     });
@@ -56,68 +116,6 @@
         return table;
     };
     
-
-    
-    var createSettingsProfileImageView = function(image_url) {
-        var imageView = Ti.UI.createImageView({
-            image : image_url,
-            borderRadius : 5,
-            left : 5,
-            top : 5,
-            bottom : 5,
-            height : 50,
-            width : 50
-        });
-        return imageView;
-    };
-
-
-    var createSettingsProfileTextView = function(title) {
-        var textView = Ti.UI.createView({
-            height : 'auto',
-            layout : 'vertical',
-            left : 70,
-            top : 10,
-            bottom : 10,
-            right : 10
-        });
-
-        var text = Ti.UI.createLabel({
-            text : title,
-            height : 'auto'
-        });
-        textView.add(text);
-
-        return textView;
-    };
-    
-    
-    exports.createSettingsTableView = function(data) {
-        var table, rowData = [];
-        // Add data to rowView
-        for (var i=0; i < data.length; i++) {
-            var row = Ti.UI.createTableViewRow({
-                height: 'auto',
-                className: data[i].className
-            });
-            
-            if (data[i].className === "settingsProfile") {
-                row.add(createSettingsProfileTextView(data[i].title));
-                row.add(createSettingsProfileImageView(data[i].leftImage));
-            } else {
-                Ti.API.info("createSettingsTableView: Not Implemented Yet.");
-            }
-            rowData.push(row);
-        }
-        table = Titanium.UI.createTableView({
-            data: rowData,
-            style:Titanium.UI.iPhone.TableViewStyle.GROUPED
-        });
-        
-        return table;
-    };
-    
-
     function formatDate() {
         var date = new Date();
         var datestr = date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear();
@@ -128,11 +126,10 @@
         }
         return datestr;
     }
-    
 
     exports.createPullToRefreshView = function(data, arrowImage, tableType) {
-        var me = this;
-        var tableView = createDefaultTableView(data);
+        var tableView = createDefaultTableView(data, tableType);
+        var db = require('model/db');
         
         var border = Ti.UI.createView({
             backgroundColor : "#576c89",
@@ -226,33 +223,49 @@
             arrow.show();
         }
         
+        function callbackHandlerForSubjects(retData) {
+            var new_subjects = db.updateAndGetSubjects(retData);
+            // Get new subject data
+            tableView.setData(new_subjects);
+        }
+        
+        function callbackHandlerForSubjectAreas(retData) {
+            var new_subjectAreas = db.updateAndGetSubjectAreas(retData);
+            // Get new subject area data
+            tableView.setData(new_subjectAreas);
+        }
+        
+        function callbackHandlerForTerms(retData) {
+            var new_terms = db.updateAndGetTerms(retData);
+            tableView.setData(new_terms);
+        }
+        
         function handleReloading() {
-            var httpReq = require('lib/http_requests'), db = require('model/db');
+            var httpReq = require('lib/http_requests'),
+                term_key,
+                subject_key;
             if(tableType === "terms") {
                 Ti.API.info("uning inside the term handler");
                 // just mock out the reload
-                httpReq.httpGetTerms(db.updateCoursesTerm);
-                //Get New data
-                var new_terms = db.getCoursesTerm();
-                // Update the view
-                tableView.setData(new_terms);
+                httpReq.httpGetTerms(callbackHandlerForTerms);
+                
             } else if(tableType === "subject_areas") {
                 // Runing inside the subject areas handler
                 Ti.API.info("uning inside the subject areas handler");
-                var term_key = Ti.UI.currentWindow.dataToPass.term;
+                term_key = Ti.UI.currentWindow.dataToPass.term;
                 // HTTP Get subject areas
-                httpReq.httpGetSubjectAreas(db.updateSubjectAreas, term_key);
-                //Get New data
-                var new_subject_areas = db.getSubjectAreas(term_key);
-                // Update the view
-                tableView.setData(new_subject_areas);
+                httpReq.httpGetSubjectAreas(callbackHandlerForSubjectAreas,
+                                            term_key);
             } else if(tableType === "subjects") {
-
+                term_key = Ti.UI.currentWindow.dataToPass.term;
+                subject_key = Ti.UI.currentWindow.dataToPass.subject;
+                // HTTP Get subjects data
+                var done = httpReq.httpGetSubjects(callbackHandlerForSubjects,
+                                                  term_key,
+                                                  subject_key);
             } else if(tableType === "courses") {
 
             }
-            
-            tableView.setFilterAttribute('searchFilter');
         }
 
         function beginReloading() {

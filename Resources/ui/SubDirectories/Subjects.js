@@ -5,16 +5,18 @@
     var instance,
         table = require('lib/tables'),
         subjects_table,
-        data;
+        dbData,
+        db = require('model/db'),
+        term = Ti.UI.currentWindow.dataToPass.term,
+        subject = Ti.UI.currentWindow.dataToPass.subject;
 
     instance = Ti.UI.currentWindow;
-    // TODO: changed to with real data
-    data = [{title: "Aerospace Studies Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Spring 2012", "course": "Aerospace Studies"}, js:"Courses.js"},
-            {title: "Anthropology Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Summer 2012", "course": "Anthropology"}, js:"Courses.js"},
-            {title: "Art Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Winter 2012", "course": "Art"}, js:"Courses.js"},
-            {title: "Computer Science Course", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Fall 2011", "course": "Computer Science"}, js:"Courses.js"}];
-
-    subjects_table = table.createPullToRefreshView(data, "../../images/whiteArrow.png", "subjects");
+    // Ti.API.info("Subjects");
+    // Ti.API.info(term);
+    // Ti.API.info(subject);
+    dbData = db.getSubjects(term, subject);
+    // Ti.API.info(JSON.stringify(dbData));
+    subjects_table = table.createPullToRefreshView(dbData, "../../images/whiteArrow.png", "subjects");
 
     //Add table view to the instance
     instance.add(subjects_table);

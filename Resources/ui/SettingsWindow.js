@@ -1,3 +1,4 @@
+require('lib/require_patch').monkeypatch(this);
 (function(){
     
     var views = {};
