@@ -59,7 +59,8 @@ require('lib/require_patch').monkeypatch(this);
         
         return table;
     };
-
+    
+    
     var createDefaultTableView = function(data, tableType) {
         var table, rowData = [], filterBar;
         
@@ -79,6 +80,9 @@ require('lib/require_patch').monkeypatch(this);
                 dataToPass: data[i].dataToPass,
                 js: data[i].js
             });
+            if (data[i].header !== undefined) {
+                row.header = data[i].header; 
+            }
             rowData.push(row);
         }
         
@@ -116,6 +120,32 @@ require('lib/require_patch').monkeypatch(this);
         return table;
     };
     
+
+    var createHeaderFilterTableView = function(data, tableType) {
+        var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                       'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                       'U', 'V', 'W', 'X', 'Y', 'Z'];
+        var breaker = 0;
+        var indexArray = [];
+        for(var i = 0; i < letters.length; i++) {
+            for(var j = 0; j < data.length; j++) {
+                var res = data[j].title.toUpperCase().indexOf(letters[i]);
+                if (res === 0) {
+                    data[j].header = letters[i];
+                    indexArray.push({title: letters[i], index: j});
+                    breaker = j++;
+                    break;
+                }
+            }
+        }
+
+        var FilterTableView = createDefaultTableView(data, tableType);
+        FilterTableView.index = indexArray;
+        
+        return FilterTableView; 
+    };
+
+    
     function formatDate() {
         var date = new Date();
         var datestr = date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear();
@@ -128,7 +158,12 @@ require('lib/require_patch').monkeypatch(this);
     }
 
     exports.createPullToRefreshView = function(data, arrowImage, tableType) {
-        var tableView = createDefaultTableView(data, tableType);
+        var tableView;
+        if (tableType === "subject_areas") {
+            tableView = createHeaderFilterTableView(data, tableType);
+        } else{
+            tableView = createDefaultTableView(data, tableType);
+        }
         var db = require('model/db');
         
         var border = Ti.UI.createView({

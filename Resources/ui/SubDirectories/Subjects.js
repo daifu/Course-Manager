@@ -11,9 +11,6 @@
         subject = Ti.UI.currentWindow.dataToPass.subject;
 
     instance = Ti.UI.currentWindow;
-    // Ti.API.info("Subjects");
-    // Ti.API.info(term);
-    // Ti.API.info(subject);
     dbData = db.getSubjects(term, subject);
     // Ti.API.info(JSON.stringify(dbData));
     subjects_table = table.createPullToRefreshView(dbData, "../../images/whiteArrow.png", "subjects");

@@ -69,6 +69,24 @@
         return retData;
     };
     
+    var addHeaderToData = function(data) {
+        var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        var breaker = 0;
+        for(var i = 0; i < letters.length; i++) {
+            for(var j = 0; j < data.length; j++) {
+                var res = data[j].title.toUpperCase().indexOf(letters[i]);
+                if(res === 0) {
+                    data[j].header = letters[i];
+                    breaker = j++;
+                    break;
+                }
+            }
+        }
+        return data;
+    };
+
+
+    
     exports.getSubjectAreas = function(term_key) {
         var query, dataArray = [], rows, rowData;
         //Open the database
@@ -90,11 +108,12 @@
             dataArray.push(rowData);
             rows.next();
         }
+        dataArray = addHeaderToData(dataArray);
         db.close();
         rows.close();
         return dataArray;
     };
-
+    
     function createSubjectAreasTable (db) {
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
@@ -135,6 +154,7 @@
             retData.push(rowData);
 
         }
+        retData = addHeaderToData(retData);
         db.close();
         return retData;
     };
