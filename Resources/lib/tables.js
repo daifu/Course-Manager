@@ -60,6 +60,15 @@ require('lib/require_patch').monkeypatch(this);
         return table;
     };
     
+    ////////////////////////////////////////////////////////////
+    ///////
+    ///////  Below is for the table view of Directory
+    ///////
+    
+    var createCourseDetailView = function(data, tableType) {
+        
+    };
+    
     
     var createDefaultTableView = function(data, tableType) {
         var table, rowData = [], filterBar;
@@ -161,7 +170,9 @@ require('lib/require_patch').monkeypatch(this);
         var tableView;
         if (tableType === "subject_areas") {
             tableView = createHeaderFilterTableView(data, tableType);
-        } else{
+        } else if (tableType === "course") {
+            tableView = createCourseDetailView(data, tableType);
+        } else {
             tableView = createDefaultTableView(data, tableType);
         }
         var db = require('model/db');
@@ -275,10 +286,16 @@ require('lib/require_patch').monkeypatch(this);
             tableView.setData(new_terms);
         }
         
+        function callbackHandlerForCourse(retData) {
+            var new_course = db.updateAndGetCourse(retData);
+            tableView.setData(new_course);
+        }
+        
         function handleReloading() {
             var httpReq = require('lib/http_requests'),
                 term_key,
-                subject_key;
+                subject_key,
+                course_id;
             if(tableType === "terms") {
                 Ti.API.info("uning inside the term handler");
                 // just mock out the reload
@@ -295,11 +312,18 @@ require('lib/require_patch').monkeypatch(this);
                 term_key = Ti.UI.currentWindow.dataToPass.term;
                 subject_key = Ti.UI.currentWindow.dataToPass.subject;
                 // HTTP Get subjects data
-                var done = httpReq.httpGetSubjects(callbackHandlerForSubjects,
+                httpReq.httpGetSubjects(callbackHandlerForSubjects,
                                                   term_key,
                                                   subject_key);
-            } else if(tableType === "courses") {
-
+            } else if(tableType === "course") {
+                term_key = Ti.UI.currentWindow.dataToPass.term;
+                subject_key = Ti.UI.currentWindow.dataToPass.subject;
+                course_id = Ti.UI.currentWindow.dataToPass.course_id;
+                //HTTP Get courses data
+                httpReq.httpGetCourse(callbackHandlerForCourse,
+                                      term_key,
+                                      subject_key,
+                                      course_id);
             }
         }
 

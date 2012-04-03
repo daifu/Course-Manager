@@ -1,7 +1,7 @@
 (function(){
     
     // Http Set up for all the request
-    function handleHttpClient(url, callback, term_key, subject_key) {
+    function handleHttpClient(url, callback) {
         var client = Ti.Network.createHTTPClient();
         // Handle the client when it is fired
         client.onload = function(e) {
@@ -33,6 +33,11 @@
 
     exports.httpGetSubjects = function(callback, term, subject) {
         var url = Ti.App.httpReqeDomain + "/api/subjects/" + term +"/" + subject;
+        handleHttpClient(url, callback);
+    };
+
+    exports.httpGetCourse = function(callback, term, subject, course_id) {
+        var url = Ti.App.httpReqeDomain + "/api/course/" + term +"/" + subject + "/" + course_id;
         handleHttpClient(url, callback);
     };
 
