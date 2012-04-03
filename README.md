@@ -1,4 +1,4 @@
-# Course Manager for UCLA
+# Course Manager for UCLA Students
 
 Welcome to my own project, and this is a project that helps UCLA students to browser
 their classes easily on their protable devices, such as iphone, android, and iPad.
