@@ -240,5 +240,10 @@
 
     exports.getCourse = function(term_key, subject_key, course_id) {
         // TODO: figure out how to manipulate the data.
+        return [];
+    }
+    
+    exports.updateAndGetCourse = function(course) {
+        return[];
     }
 })();

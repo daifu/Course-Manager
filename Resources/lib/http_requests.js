@@ -5,7 +5,7 @@
         var client = Ti.Network.createHTTPClient();
         // Handle the client when it is fired
         client.onload = function(e) {
-            // Ti.API.info("HTTP Callback: " + this.responseText);
+            Ti.API.info("HTTP Callback: " + this.responseText);
             callback.call(null, JSON.parse(this.responseText));
         };
         
@@ -38,6 +38,7 @@
 
     exports.httpGetCourse = function(callback, term, subject, course_id) {
         var url = Ti.App.httpReqeDomain + "/api/course/" + term +"/" + subject + "/" + course_id;
+        Ti.API.info(url);
         handleHttpClient(url, callback);
     };
 

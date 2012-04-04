@@ -1,6 +1,5 @@
 require('lib/require_patch').monkeypatch(this);
 (function(){
-    
 
     var createSettingsProfileImageView = function(image_url) {
         var imageView = Ti.UI.createImageView({
@@ -64,12 +63,7 @@ require('lib/require_patch').monkeypatch(this);
     ///////
     ///////  Below is for the table view of Directory
     ///////
-    
-    var createCourseDetailView = function(data, tableType) {
-        
-    };
-    
-    
+   
     var createDefaultTableView = function(data, tableType) {
         var table, rowData = [], filterBar;
         
@@ -171,7 +165,12 @@ require('lib/require_patch').monkeypatch(this);
         if (tableType === "subject_areas") {
             tableView = createHeaderFilterTableView(data, tableType);
         } else if (tableType === "course") {
-            tableView = createCourseDetailView(data, tableType);
+            // Pass if thiere is course view
+            Ti.API.info("Running into createPullToRefreshView... ");
+            tableView = Ti.UI.createTableView({
+                backgroundColor: "white",
+                data: data
+            });
         } else {
             tableView = createDefaultTableView(data, tableType);
         }
@@ -374,5 +373,150 @@ require('lib/require_patch').monkeypatch(this);
         return tableView;
     };
 
+
+    var createCourseView = function(data, arrowImage, tableType) {
+        // Requirement
+        // One Scroll view as a background
+        // Several group table views for the details and sections
+        var mainView = Ti.UI.createView({
+           width: '100%',
+           height: '100%',
+           backgroundColor: '#536895'
+        });
+        var view1 = Ti.UI.createView({
+            backgroundColor : '#536895'
+        });
+        
+        // create a table
+        var detailsTableRow1 = Ti.UI.createTableViewRow({
+            header: 'Details 1',
+            touchEnabled: false
+        });
+        var detailsTableRow2 = Ti.UI.createTableViewRow({
+            touchEnabled: false
+        });
+        var l1 = Ti.UI.createLabel({
+            text : 'View 1',
+            color : 'black',
+            width : 'auto',
+            height : 'auto',
+            touchEnabled: false
+        });
+        var l11 = Ti.UI.createLabel({
+            text : 'View 11',
+            color : 'black',
+            width : 'auto',
+            height : 'auto',
+            touchEnabled: false
+        });
+        detailsTableRow1.add(l1);
+        detailsTableRow2.add(l11);
+        
+        var detailsTableRow3 = Ti.UI.createTableViewRow({
+            header: 'Details 2'
+        });
+        var detailsTableRow4 = Ti.UI.createTableViewRow();
+        var ll1 = Ti.UI.createLabel({
+            text : 'View 1',
+            color : 'black',
+            width : 'auto',
+            height : 'auto'
+        });
+        var ll11 = Ti.UI.createLabel({
+            text : 'View l111',
+            color : 'black',
+            width : 'auto',
+            height : 'auto'
+        });
+        detailsTableRow3.add(ll11);
+        detailsTableRow4.add(ll1);
+        
+        //TODO: using the dynaimic crated data
+        var tmpdata = [detailsTableRow1, detailsTableRow2, detailsTableRow3, detailsTableRow4];
+        var detailsTable = exports.createPullToRefreshView(tmpdata, arrowImage, tableType);
+        Ti.API.info(detailsTable);
+        view1.add(detailsTable);
+
+
+        var view2 = Ti.UI.createView({
+            backgroundColor : '#536895'
+        });
+        var l2 = Ti.UI.createLabel({
+            text : 'Click Me (View 2 - see log)',
+            color : 'white',
+            width : 'auto',
+            height : 'auto'
+        });
+        view2.add(l2);
+
+        var view3 = Ti.UI.createView({
+            backgroundColor : '#536895'
+        });
+        var l3 = Ti.UI.createLabel({
+            text : 'View 3',
+            color : 'white',
+            width : 'auto',
+            height : 'auto'
+        });
+        view3.add(l3);
+
+        var scrollView = Titanium.UI.createScrollableView({
+            views : [view1, view2, view3],
+            pagingControlHeight : 30,
+            maxZoomScale : 2.0,
+            currentPage : 0,
+            top: 32
+        });
+        var i = 1;
+        var activeView = view1;
+
+        var tabbar = Ti.UI.createTabbedBar({
+            labels: ['Details', 'Sections', 'Prof. Reviews'],
+            backgroundColor: '#336699',
+            top: 2,
+            height: 28,
+            width: 270,
+            style: Ti.UI.iPhone.SystemButtonStyle.BAR,
+            index: 0
+        });
+
+        scrollView.addEventListener('scroll', function(e) {
+            activeView = e.view;
+            // the object handle to the view that is about to become visible
+            i = e.currentPage;
+            if (i !== undefined) {
+                tabbar.setIndex(i);
+                Titanium.API.info("scroll called - current index " + i + ' active view ' + activeView);
+            }
+        });
+        
+        tabbar.addEventListener('click', function(e){
+           // active index
+           var currentIndex = e.index;
+           // change the view when user click on the tabedbar
+           scrollView.setCurrentPage(currentIndex);
+        });
+        
+        scrollView.addEventListener('click', function(e) {
+            Ti.API.info('ScrollView received click event, source = ' + e.source);
+        });
+        scrollView.addEventListener('touchend', function(e) {
+            Ti.API.info('ScrollView received touchend event, source = ' + e.source);
+        });
+        
+
+        
+        mainView.add(scrollView);
+        mainView.add(tabbar);
+        return mainView;
+    };
+
+
+    exports.createCourseView = function(data, arrowImage, tableType) {
+        // Create a main view
+        Ti.API.info("running into createCourseView....");
+        var tableView = createCourseView(data, arrowImage, tableType);
+        return tableView;
+    };
 
 })();
