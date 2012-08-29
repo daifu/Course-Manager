@@ -30,7 +30,8 @@ function resolveFontName(fontName) {
     Ti.Facebook.permissions = ['publish_stream', 'user_about_me', 'email', 'friends_about_me', 'friends_photos'];
     
     // Install the database
-    Ti.Database.install('ucla_courses.sqlite', 'courses');
+    var db = Ti.Database.install('ucla_courses.sqlite', 'courses');
+    db.file.setRemoteBackup(false);
     
     var updateLoginStatus = function() {
         if(Ti.Facebook.loggedIn) {
@@ -86,7 +87,6 @@ function resolveFontName(fontName) {
             globals.fbLoggedIn.open();
         }
     };
-
 
     // capture
     Ti.Facebook.addEventListener('login', updateLoginStatus);

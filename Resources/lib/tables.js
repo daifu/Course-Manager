@@ -33,7 +33,7 @@ require('lib/require_patch').monkeypatch(this);
 
         return textView;
     };
-    
+
     exports.createSettingsTableView = function(data) {
         var table, rowData = [];
         // Add data to rowView
@@ -42,7 +42,7 @@ require('lib/require_patch').monkeypatch(this);
                 height: 'auto',
                 className: data[i].className
             });
-            
+
             if (data[i].className === "settingsProfile") {
                 row.add(createSettingsProfileTextView(data[i].title));
                 row.add(createSettingsProfileImageView(data[i].leftImage));
@@ -55,23 +55,23 @@ require('lib/require_patch').monkeypatch(this);
             data: rowData,
             style:Titanium.UI.iPhone.TableViewStyle.GROUPED
         });
-        
+
         return table;
     };
-    
+
     ////////////////////////////////////////////////////////////
     ///////
     ///////  Below is for the table view of Directory
     ///////
-   
+
     var createDefaultTableView = function(data, tableType) {
         var table, rowData = [], filterBar;
-        
+
         // filterBar to filter out the result on the table
         filterBar = Titanium.UI.createSearchBar({
             hintText: "Search for title"
         });
-        
+
 
         // Add data to rowView
         for (var i=0; i < data.length; i++) {
@@ -84,17 +84,17 @@ require('lib/require_patch').monkeypatch(this);
                 js: data[i].js
             });
             if (data[i].header !== undefined) {
-                row.header = data[i].header; 
+                row.header = data[i].header;
             }
             rowData.push(row);
         }
-        
+
         table = Titanium.UI.createTableView({
             data: rowData,
             search: filterBar,
             filterAttribute: "searchFilter"
         });
-        
+
         // Handle row click event
         table.addEventListener('click', function(e){
             if (e.source.hasChild) {
@@ -119,10 +119,10 @@ require('lib/require_patch').monkeypatch(this);
                 alert("No window to open :(");
             }
         });
-        
+
         return table;
     };
-    
+
 
     var createHeaderFilterTableView = function(data, tableType) {
         var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -144,11 +144,11 @@ require('lib/require_patch').monkeypatch(this);
 
         var FilterTableView = createDefaultTableView(data, tableType);
         FilterTableView.index = indexArray;
-        
-        return FilterTableView; 
+
+        return FilterTableView;
     };
 
-    
+
     function formatDate() {
         var date = new Date();
         var datestr = date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear();
@@ -172,10 +172,13 @@ require('lib/require_patch').monkeypatch(this);
                 data: data
             });
         } else {
+            Ti.API.info("Running into createPullToRefreshView for "+tableType+"... ");
             tableView = createDefaultTableView(data, tableType);
         }
+
+        Ti.API.info("Just create a normal table view for " + tableType);
         var db = require('model/db');
-        
+
         var border = Ti.UI.createView({
             backgroundColor : "#576c89",
             height : 2,
@@ -254,6 +257,13 @@ require('lib/require_patch').monkeypatch(this);
         var pulling = false;
         var reloading = false;
 
+        function beginReloading() {
+            // requesting requests
+            Ti.API.info("beginReloading");
+            handleReloading();
+            endReloading();
+        }
+
         function endReloading() {
             // when you're done, just reset
             tableView.setContentInsets({
@@ -267,29 +277,30 @@ require('lib/require_patch').monkeypatch(this);
             actInd.hide();
             arrow.show();
         }
-        
+
         function callbackHandlerForSubjects(retData) {
             var new_subjects = db.updateAndGetSubjects(retData);
             // Get new subject data
             tableView.setData(new_subjects);
         }
-        
+
         function callbackHandlerForSubjectAreas(retData) {
             var new_subjectAreas = db.updateAndGetSubjectAreas(retData);
             // Get new subject area data
             tableView.setData(new_subjectAreas);
         }
-        
+
         function callbackHandlerForTerms(retData) {
+            Ti.API.info("Ruing update on terms..");
             var new_terms = db.updateAndGetTerms(retData);
             tableView.setData(new_terms);
         }
-        
+
         function callbackHandlerForCourse(retData) {
             var new_course = db.updateAndGetCourse(retData);
             tableView.setData(new_course);
         }
-        
+
         function handleReloading() {
             var httpReq = require('lib/http_requests'),
                 term_key,
@@ -299,7 +310,7 @@ require('lib/require_patch').monkeypatch(this);
                 Ti.API.info("uning inside the term handler");
                 // just mock out the reload
                 httpReq.httpGetTerms(callbackHandlerForTerms);
-                
+
             } else if(tableType === "subject_areas") {
                 // Runing inside the subject areas handler
                 Ti.API.info("uning inside the subject areas handler");
@@ -326,14 +337,11 @@ require('lib/require_patch').monkeypatch(this);
             }
         }
 
-        function beginReloading() {
-            handleReloading();
-            endReloading();
-        }
+
 
         tableView.addEventListener('scroll', function(e) {
             var offset = e.contentOffset.y;
-            if(offset <= -65.0 && !pulling) {
+            if(offset <= -65.0 && !pulling && !reloading) {
                 var t1 = Ti.UI.create2DMatrix();
                 t1 = t1.rotate(-180);
                 pulling = true;
@@ -342,7 +350,7 @@ require('lib/require_patch').monkeypatch(this);
                     duration : 180
                 });
                 statusLabel.text = "Release to refresh...";
-            } else if(pulling && offset > -65.0 && offset < 0) {
+            } else if((offset > -65.0 && offset < 0 ) && pulling && !reloading) {
                 pulling = false;
                 var t2 = Ti.UI.create2DMatrix();
                 arrow.animate({
@@ -353,8 +361,8 @@ require('lib/require_patch').monkeypatch(this);
             }
         });
 
-        tableView.addEventListener('scrollEnd', function(e) {
-            if(pulling && !reloading && e.contentOffset.y <= -65.0) {
+        tableView.addEventListener('dragEnd', function(e) {
+            if(pulling && !reloading) {
                 reloading = true;
                 pulling = false;
                 arrow.hide();
@@ -365,11 +373,12 @@ require('lib/require_patch').monkeypatch(this);
                 }, {
                     animated : true
                 });
+                tableView.scrollToTop(-60,true);
                 arrow.transform = Ti.UI.create2DMatrix();
                 beginReloading();
             }
         });
-        
+
         return tableView;
     };
 
@@ -386,7 +395,7 @@ require('lib/require_patch').monkeypatch(this);
         var view1 = Ti.UI.createView({
             backgroundColor : '#536895'
         });
-        
+
         // create a table
         var detailsTableRow1 = Ti.UI.createTableViewRow({
             header: 'Details 1',
@@ -411,7 +420,7 @@ require('lib/require_patch').monkeypatch(this);
         });
         detailsTableRow1.add(l1);
         detailsTableRow2.add(l11);
-        
+
         var detailsTableRow3 = Ti.UI.createTableViewRow({
             header: 'Details 2'
         });
@@ -430,7 +439,7 @@ require('lib/require_patch').monkeypatch(this);
         });
         detailsTableRow3.add(ll11);
         detailsTableRow4.add(ll1);
-        
+
         //TODO: using the dynaimic crated data
         var tmpdata = [detailsTableRow1, detailsTableRow2, detailsTableRow3, detailsTableRow4];
         var detailsTable = exports.createPullToRefreshView(tmpdata, arrowImage, tableType);
@@ -470,7 +479,7 @@ require('lib/require_patch').monkeypatch(this);
         var i = 1;
         var activeView = view1;
 
-        var tabbar = Ti.UI.createTabbedBar({
+        var tabbar = Ti.UI.iOS.createTabbedBar({
             labels: ['Details', 'Sections', 'Prof. Reviews'],
             backgroundColor: '#336699',
             top: 2,
@@ -489,23 +498,23 @@ require('lib/require_patch').monkeypatch(this);
                 Titanium.API.info("scroll called - current index " + i + ' active view ' + activeView);
             }
         });
-        
+
         tabbar.addEventListener('click', function(e){
            // active index
            var currentIndex = e.index;
            // change the view when user click on the tabedbar
            scrollView.setCurrentPage(currentIndex);
         });
-        
+
         scrollView.addEventListener('click', function(e) {
             Ti.API.info('ScrollView received click event, source = ' + e.source);
         });
         scrollView.addEventListener('touchend', function(e) {
             Ti.API.info('ScrollView received touchend event, source = ' + e.source);
         });
-        
 
-        
+
+
         mainView.add(scrollView);
         mainView.add(tabbar);
         return mainView;

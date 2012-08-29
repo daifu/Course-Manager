@@ -1,11 +1,14 @@
 (function(){
     var database_path;
-   
+
     //{title: "Spring 2012", className: "tableRow", hasChild:true, dataToPass:{"quarter_year":"Spring 2012"}, js:"ui/SubDirectories/SubjectAreas.js"}
     exports.getTerms = function() {
         var query, dataArray = [], rows, rowData;
         // Connect to the database
         var db = Ti.Database.open('courses');
+        if (!tableExists(db, 'terms')) {
+            createSubjectsTable(db);
+        }
         query = "SELECT * FROM terms";
         rows = db.execute(query);
 
@@ -26,7 +29,7 @@
         rows.close();
         return dataArray;
     };
-    
+
     function createTermsTable(db) {
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
@@ -36,7 +39,7 @@
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
-    
+
     // Update the terms
     exports.updateAndGetTerms = function(terms) {
         // Delete all the data from the database
@@ -64,11 +67,11 @@
             retData.push(rowData);
 
         }
-        
+
         db.close();
         return retData;
     };
-    
+
     var addHeaderToData = function(data) {
         var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
         var breaker = 0;
@@ -86,11 +89,14 @@
     };
 
 
-    
+
     exports.getSubjectAreas = function(term_key) {
         var query, dataArray = [], rows, rowData;
         //Open the database
         var db = Ti.Database.open('courses');
+        if (!tableExists(db, 'subject_areas')) {
+            createSubjectsTable(db);
+        }
         query = "SELECT * FROM subject_areas WHERE term = ?";
         rows = db.execute(query, term_key);
 
@@ -113,7 +119,7 @@
         rows.close();
         return dataArray;
     };
-    
+
     function createSubjectAreasTable (db) {
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
@@ -124,7 +130,7 @@
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
-    
+
     exports.updateAndGetSubjectAreas = function(subject_areas) {
         var delete_query,
             insert_query,
@@ -163,6 +169,10 @@
         var query, dataArray = [], rows, rowData;
         //Open the database
         var db = Ti.Database.open('courses');
+        Ti.API.info("term_key: " + term_key + "  subject_key: "+ subject_key);
+        if (!tableExists(db, 'subjects')) {
+            createSubjectsTable(db);
+        }
         query = "SELECT * FROM subjects WHERE term = ? AND subject = ?";
         rows = db.execute(query, term_key, subject_key);
 
@@ -172,7 +182,7 @@
                 dataToPass : {
                     "term" : rows.fieldByName('term'),
                     "course_id": rows.fieldByName('key'),
-                    "subject": rows.fieldByName('subject') 
+                    "subject": rows.fieldByName('subject')
                 },
                 js : "Courses.js",
                 hasChild: true,
@@ -197,7 +207,7 @@
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
-    
+
     exports.updateAndGetSubjects = function(subjects) {
         var delete_query,
             insert_query,
@@ -214,7 +224,7 @@
         for(var i = 0; i < sc.length; i++) {
             db.execute(insert_query,
                        sc[i].key,
-                       sc[i].name, 
+                       sc[i].name,
                        subjects.term,
                        subjects.subject,
                        sc[i].created_at);
@@ -231,19 +241,38 @@
             };
             retData.push(rowData);
         }
-        
+
         db.close();
         //return update data
         return retData;
     };
 
+    function tableExists( dbObj, table) {
+        var rs;
+        if ( ! dbObj ) {
+            return false;
+        }
+
+        try {
+            rs = dbObj.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' and name = '" + table + "'");
+        }
+        catch(e2) {
+            return false;
+        }
+        if ( (! rs) || (! rs.isValidRow()) || ( rs.field(0) === 0 ) ) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     exports.getCourse = function(term_key, subject_key, course_id) {
         // TODO: figure out how to manipulate the data.
         return [];
-    }
-    
+    };
+
     exports.updateAndGetCourse = function(course) {
         return[];
-    }
+    };
 })();

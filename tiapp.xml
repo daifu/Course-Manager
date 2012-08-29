@@ -7,7 +7,7 @@
         <target device="blackberry">false</target>
         <target device="android">true</target>
     </deployment-targets>
-    <sdk-version>1.8.2</sdk-version>
+    <sdk-version>2.1.0.GA</sdk-version>
     <id>ucla.course.manager</id>
     <name>UCLA Course Manager</name>
     <version>1.0</version>
