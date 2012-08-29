@@ -4,3 +4,6 @@ tmp
 *.pyo
 build/
 build.log
+.project
+manifest
+tiapp.xml
