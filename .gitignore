@@ -1,0 +1,5 @@
+.DS_Store
+.project
+build/
+tiapp.xml
+manifest
