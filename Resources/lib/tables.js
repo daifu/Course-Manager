@@ -47,7 +47,7 @@ require('lib/require_patch').monkeypatch(this);
                 row.add(createSettingsProfileTextView(data[i].title));
                 row.add(createSettingsProfileImageView(data[i].leftImage));
             } else {
-                Ti.API.info("createSettingsTableView: Not Implemented Yet.");
+                // Ti.API.info("createSettingsTableView: Not Implemented Yet.");
             }
             rowData.push(row);
         }
@@ -87,6 +87,11 @@ require('lib/require_patch').monkeypatch(this);
                 row.header = data[i].header;
             }
             rowData.push(row);
+        }
+
+        if (tableType === "subjects") {
+            Ti.API.info("Subjects rowData: ");
+            Ti.API.info(JSON.stringify(rowData));
         }
 
         table = Titanium.UI.createTableView({
@@ -166,17 +171,17 @@ require('lib/require_patch').monkeypatch(this);
             tableView = createHeaderFilterTableView(data, tableType);
         } else if (tableType === "course") {
             // Pass if thiere is course view
-            Ti.API.info("Running into createPullToRefreshView... ");
+            // Ti.API.info("Running into createPullToRefreshView for " + tableType);
             tableView = Ti.UI.createTableView({
                 backgroundColor: "white",
                 data: data
             });
         } else {
-            Ti.API.info("Running into createPullToRefreshView for "+tableType+"... ");
+            // Ti.API.info("Running into createPullToRefreshView for "+tableType+"... ");
             tableView = createDefaultTableView(data, tableType);
         }
 
-        Ti.API.info("Just create a normal table view for " + tableType);
+        // Ti.API.info("Just create a normal table view for " + tableType);
         var db = require('model/db');
 
         var border = Ti.UI.createView({
@@ -259,7 +264,7 @@ require('lib/require_patch').monkeypatch(this);
 
         function beginReloading() {
             // requesting requests
-            Ti.API.info("beginReloading");
+            // Ti.API.info("beginReloading");
             handleReloading();
             endReloading();
         }
@@ -291,7 +296,6 @@ require('lib/require_patch').monkeypatch(this);
         }
 
         function callbackHandlerForTerms(retData) {
-            Ti.API.info("Ruing update on terms..");
             var new_terms = db.updateAndGetTerms(retData);
             tableView.setData(new_terms);
         }
@@ -307,18 +311,17 @@ require('lib/require_patch').monkeypatch(this);
                 subject_key,
                 course_id;
             if(tableType === "terms") {
-                Ti.API.info("uning inside the term handler");
                 // just mock out the reload
                 httpReq.httpGetTerms(callbackHandlerForTerms);
 
             } else if(tableType === "subject_areas") {
                 // Runing inside the subject areas handler
-                Ti.API.info("uning inside the subject areas handler");
                 term_key = Ti.UI.currentWindow.dataToPass.term;
                 // HTTP Get subject areas
                 httpReq.httpGetSubjectAreas(callbackHandlerForSubjectAreas,
                                             term_key);
             } else if(tableType === "subjects") {
+                // Specific subjects
                 term_key = Ti.UI.currentWindow.dataToPass.term;
                 subject_key = Ti.UI.currentWindow.dataToPass.subject;
                 // HTTP Get subjects data
@@ -326,6 +329,7 @@ require('lib/require_patch').monkeypatch(this);
                                                   term_key,
                                                   subject_key);
             } else if(tableType === "course") {
+                // Running course datatype
                 term_key = Ti.UI.currentWindow.dataToPass.term;
                 subject_key = Ti.UI.currentWindow.dataToPass.subject;
                 course_id = Ti.UI.currentWindow.dataToPass.course_id;
@@ -440,10 +444,9 @@ require('lib/require_patch').monkeypatch(this);
         detailsTableRow3.add(ll11);
         detailsTableRow4.add(ll1);
 
-        //TODO: using the dynaimic crated data
+        //TODO: using the dynaimic created data
         var tmpdata = [detailsTableRow1, detailsTableRow2, detailsTableRow3, detailsTableRow4];
         var detailsTable = exports.createPullToRefreshView(tmpdata, arrowImage, tableType);
-        Ti.API.info(detailsTable);
         view1.add(detailsTable);
 
 
@@ -507,10 +510,10 @@ require('lib/require_patch').monkeypatch(this);
         });
 
         scrollView.addEventListener('click', function(e) {
-            Ti.API.info('ScrollView received click event, source = ' + e.source);
+            // Ti.API.info('ScrollView received click event, source = ' + e.source);
         });
         scrollView.addEventListener('touchend', function(e) {
-            Ti.API.info('ScrollView received touchend event, source = ' + e.source);
+            // Ti.API.info('ScrollView received touchend event, source = ' + e.source);
         });
 
 
@@ -523,7 +526,7 @@ require('lib/require_patch').monkeypatch(this);
 
     exports.createCourseView = function(data, arrowImage, tableType) {
         // Create a main view
-        Ti.API.info("running into createCourseView....");
+        // Ti.API.info("running into createCourseView....");
         var tableView = createCourseView(data, arrowImage, tableType);
         return tableView;
     };

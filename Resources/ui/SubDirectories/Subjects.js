@@ -1,7 +1,7 @@
 require('lib/require_patch').monkeypatch(this);
 // Create a table view for all the subject areas
 (function(){
-    
+
     // Working with the current window
     var instance,
         table = require('lib/tables'),
@@ -14,7 +14,6 @@ require('lib/require_patch').monkeypatch(this);
 
     instance = Ti.UI.currentWindow;
     dbData = db.getSubjects(term, subject);
-    
 
     var callback = function(retData) {
         var dbData = db.updateAndGetSubjects(retData);
@@ -23,7 +22,7 @@ require('lib/require_patch').monkeypatch(this);
         //Add table view to the instance
         Ti.UI.currentWindow.add(subjects_table);
     };
-    
+
     dbData = db.getSubjects(term, subject);
 
     if(dbData.length === 0) {
@@ -34,5 +33,5 @@ require('lib/require_patch').monkeypatch(this);
         //Add table view to the instance
         Ti.UI.currentWindow.add(subjects_table);
     }
-    
+
 })();

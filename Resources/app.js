@@ -24,15 +24,15 @@ function resolveFontName(fontName) {
     };
     Ti.App.logoFont = resolveFontName("Frutiger LT Std");
     Ti.App.textFont = resolveFontName("Futura Std");
-    Ti.App.httpReqeDomain = "http://localhost:3000";
+    Ti.App.httpReqeDomain = "http://localhost:5000";
 
     Ti.Facebook.appid = "140022819458918";
     Ti.Facebook.permissions = ['publish_stream', 'user_about_me', 'email', 'friends_about_me', 'friends_photos'];
-    
+
     // Install the database
-    var db = Ti.Database.install('ucla_courses.sqlite', 'courses');
+    var db = Ti.Database.install('ucla_courses_001.sqlite', 'courses');
     db.file.setRemoteBackup(false);
-    
+
     var updateLoginStatus = function() {
         if(Ti.Facebook.loggedIn) {
             AppTabGroup = require('ui/AppTabGroup');
@@ -91,6 +91,6 @@ function resolveFontName(fontName) {
     // capture
     Ti.Facebook.addEventListener('login', updateLoginStatus);
     Ti.Facebook.addEventListener('logout', updateLoginStatus);
-    
+
     updateLoginStatus();
 })();

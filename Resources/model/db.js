@@ -7,7 +7,7 @@
         // Connect to the database
         var db = Ti.Database.open('courses');
         if (!tableExists(db, 'terms')) {
-            createSubjectsTable(db);
+            createTermsTable(db);
         }
         query = "SELECT * FROM terms";
         rows = db.execute(query);
@@ -16,7 +16,7 @@
             rowData = {
                 title : rows.fieldByName('name'),
                 dataToPass : {
-                    "term" : rows.fieldByName('key')
+                    "term" : rows.fieldByName('term')
                 },
                 js : "ui/SubDirectories/SubjectAreas.js",
                 hasChild: true,
@@ -34,27 +34,30 @@
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
                             "'terms' ('id' integer NOT NULL PRIMARY KEY AUTOINCREMENT,",
-                            "'key' TEXT NOT NULL,",
+                            "'term' TEXT NOT NULL,",
                             "'name' TEXT NOT NULL,",
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
 
     // Update the terms
+    // passed terms sample
+    // [{"key":"13S","name":"Tentative Spring 2013","created_at":"2012-09-01T02:14:43.432Z"}...]
     exports.updateAndGetTerms = function(terms) {
         // Delete all the data from the database
         // Insert the new data to the database.
         var delete_query, insert_query, rowData, retData = [];
         // Connect to the database
         var db = Ti.Database.open('courses');
-        // Handle table if it is not exists;
-        createTermsTable(db);
+        if (!tableExists(db, 'terms')) {
+            // Handle table if it is not exists;
+            createTermsTable(db);
+        }
         delete_query = "DELETE FROM terms";
         db.execute(delete_query);
-        insert_query = "INSERT INTO terms (key, name, created_at) VALUES (?, ?, ?)";
-
+        insert_query = "INSERT INTO terms (term, name, created_at) VALUES (?, ?, ?)";
         for(var i = 0; i < terms.length; i++) {
-            db.execute(insert_query, terms[i].key, terms[i].name, terms[i].created_at);
+            row = db.execute(insert_query, terms[i].key, terms[i].name, terms[i].created_at);
             rowData = {
                 title : terms[i].name,
                 dataToPass : {
@@ -65,7 +68,6 @@
                 searchFilter : terms[i].name
             };
             retData.push(rowData);
-
         }
 
         db.close();
@@ -95,7 +97,7 @@
         //Open the database
         var db = Ti.Database.open('courses');
         if (!tableExists(db, 'subject_areas')) {
-            createSubjectsTable(db);
+            createSubjectAreasTable(db);
         }
         query = "SELECT * FROM subject_areas WHERE term = ?";
         rows = db.execute(query, term_key);
@@ -105,7 +107,7 @@
                 title : rows.fieldByName('name'),
                 dataToPass : {
                     "term" : rows.fieldByName('term'),
-                    "subject": rows.fieldByName('key')
+                    "subject": rows.fieldByName('subject')
                 },
                 js : "Subjects.js",
                 hasChild: true,
@@ -124,29 +126,34 @@
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
                             "'subject_areas' ('id' integer NOT NULL PRIMARY KEY AUTOINCREMENT,",
-                            "'key' TEXT NOT NULL,",
+                            "'subject' TEXT NOT NULL,",
                             "'name' TEXT NOT NULL,",
                             "'term' TEXT NOT NULL, ",
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
 
+    // passed subject_areas sample:
+    // {"term":"12F", "subject_areas":[{"key":"AERO+ET",name:"Aerospace Studies","created_at":"..."....}]}
     exports.updateAndGetSubjectAreas = function(subject_areas) {
         var delete_query,
             insert_query,
             sa = subject_areas.subject_areas,
             rowData,
-            retData = [];
+            retData = [],
+            row;
         // Connect to the database
         var db = Ti.Database.open('courses');
         createSubjectAreasTable(db);
+        Ti.API.info("updateAndGetSubjectAreas...");
+        // Ti.API.info(subject_areas);
         delete_query = "DELETE FROM subject_areas where term = ?";
         db.execute(delete_query, subject_areas.term);
-        insert_query = "INSERT INTO subject_areas (key, name, term, created_at) VALUES (?, ?, ?, ?)";
+        insert_query = "INSERT INTO subject_areas (subject, name, term, created_at) VALUES (?, ?, ?, ?)";
 
 
         for(var i = 0; i < sa.length; i++) {
-            db.execute(insert_query, sa[i].key, sa[i].name, subject_areas.term, sa[i].created_at);
+            row = db.execute(insert_query, sa[i].key, sa[i].name, subject_areas.term, sa[i].created_at);
             rowData = {
                 title : sa[i].name,
                 dataToPass : {
@@ -158,7 +165,6 @@
                 searchFilter : sa[i].name
             };
             retData.push(rowData);
-
         }
         retData = addHeaderToData(retData);
         db.close();
@@ -169,7 +175,6 @@
         var query, dataArray = [], rows, rowData;
         //Open the database
         var db = Ti.Database.open('courses');
-        Ti.API.info("term_key: " + term_key + "  subject_key: "+ subject_key);
         if (!tableExists(db, 'subjects')) {
             createSubjectsTable(db);
         }
@@ -181,8 +186,8 @@
                 title : rows.fieldByName('name'),
                 dataToPass : {
                     "term" : rows.fieldByName('term'),
-                    "course_id": rows.fieldByName('key'),
-                    "subject": rows.fieldByName('subject')
+                    "subject": rows.fieldByName('subject'),
+                    "course_id": rows.fieldByName('course_id')
                 },
                 js : "Courses.js",
                 hasChild: true,
@@ -200,14 +205,16 @@
         // Write string in multiple lines
         var create_query = ["CREATE TABLE IF NOT EXISTS",
                             "'subjects' ('id' integer NOT NULL PRIMARY KEY AUTOINCREMENT,",
-                            "'key' TEXT NOT NULL,",
+                            "'course_id' TEXT NOT NULL,",
                             "'name' TEXT NOT NULL,",
-                            "'term' TEXT NOT NULL, ",
+                            "'term' TEXT NOT NULL,",
                             "'subject' TEXT NOT NULL,",
                             "'created_at' TEXT NOT NULL)"].join(' ');
         db.execute(create_query);
     }
 
+    // passed subjects sample:
+    // {"term":"12F", "subject":"AP+LANG", "classes":[{"key":"0001A+++",name:"AF ... Swahili","created_at":"..."....}]}
     exports.updateAndGetSubjects = function(subjects) {
         var delete_query,
             insert_query,
@@ -219,7 +226,7 @@
         createSubjectsTable(db);
         delete_query = "DELETE FROM subjects where term = ? AND subject = ?";
         db.execute(delete_query, subjects.term, subjects.subject);
-        insert_query = "INSERT INTO subjects (key, name, term, subject, created_at) VALUES (?, ?, ?, ?, ?)";
+        insert_query = "INSERT INTO subjects (course_id, name, term, subject, created_at) VALUES (?, ?, ?, ?, ?)";
 
         for(var i = 0; i < sc.length; i++) {
             db.execute(insert_query,
@@ -231,9 +238,9 @@
             rowData = {
                 title : sc[i].name,
                 dataToPass : {
-                    "term" : subjects.term,
                     "course_id" : sc[i].key,
-                    "subject" : sc[i].subject
+                    "term" : subjects.term,
+                    "subject" : subjects.subject
                 },
                 js : "Courses.js",
                 hasChild : true,
@@ -247,12 +254,27 @@
         return retData;
     };
 
+
+
+    exports.getCourse = function(term_key, subject_key, course_id) {
+        // TODO: figure out how to manipulate the data.
+        Ti.API.info("getCourse() Not implemented. Pass in: term_key: " + term_key + " subject_key: " + subject_key + " course_id: " + course_id);
+        return [];
+    };
+
+    // passed course sample:
+    // Check this link to see the sample:
+    // http://uclacourse.herokuapp.com/api/course/12F/BIOL+CH/0254A+++
+    exports.updateAndGetCourse = function(course) {
+        Ti.API.info("updateAndGetCourse Not implemented.");
+        return[];
+    };
+
     function tableExists( dbObj, table) {
         var rs;
         if ( ! dbObj ) {
             return false;
         }
-
         try {
             rs = dbObj.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' and name = '" + table + "'");
         }
@@ -266,13 +288,24 @@
         return true;
     }
 
-
-    exports.getCourse = function(term_key, subject_key, course_id) {
-        // TODO: figure out how to manipulate the data.
-        return [];
-    };
-
-    exports.updateAndGetCourse = function(course) {
-        return[];
-    };
+    function dropTable(dbObj, table) {
+        var rs;
+        if (!dbObj) {
+            return false;
+        }
+        try {
+            Ti.API.info("drop table if exists "+table+"");
+            rs = dbObj.execute("drop table if exists "+ table +"");
+            if (!tableExists(dbObj, 'terms')) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(e2) {
+            return false;
+        }
+        if (!rs) {
+            return false;
+        }
+    }
 })();

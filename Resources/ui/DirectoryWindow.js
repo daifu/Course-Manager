@@ -1,4 +1,7 @@
 require('lib/require_patch').monkeypatch(this);
+// Directory path:
+// Terms > SubjectAreas > Subjects > Courses
+
 (function() {
 
 	exports.DirectoryWindow = function(args) {
@@ -10,6 +13,7 @@ require('lib/require_patch').monkeypatch(this);
 			httpReq = require('lib/http_requests'),
 			dbData;
 
+		// HTTP request callback
 		var callback = function (retData) {
 			var dbData = db.updateAndGetTerms(retData);
 			quarter_year_table = new table.createPullToRefreshView(dbData, "../../images/whiteArrow.png", "terms");
